@@ -173,9 +173,75 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="Git教程"><a href="#Git教程" class="headerlink" title="Git教程"></a>Git教程</h1><h2 id="Git是什么？"><a href="#Git是什么？" class="headerlink" title="Git是什么？"></a>Git是什么？</h2><p>分布式版本控制系统，方便我们知道每一个版本的变更改动。与CVS及SVN这样的集中式版本控制系统（版本库集中存放在中央处理器）来说，分布式版本控制系统没有中央服务器，每个人的电脑都拥有完整的版本库。相当于每一个人都是一台“svn服务器”，写完的代码提交到自己的电脑服务器（这个过程不需要联网）上就是commit，将代码的改动发送给其让人的电脑服务器就是push。</p>
-        
-          <a class="article-more-a" href="/2021/04/09/Git%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/#more">more >></a>
-        
+<h2 id="安装Git"><a href="#安装Git" class="headerlink" title="安装Git"></a>安装Git</h2><h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><p>版本库又名仓库（repository），可以简单理解为一个被Git管理起来的目录。</p>
+<p>1、创建一个空目录，进入目录</p>
+<p><code>mkdir &lt;目录名&gt;</code></p>
+<p><code>cd &lt;上一行设置的目录名&gt;</code></p>
+<p>2、将目录初始化为Git可以管理的目录（一定要处于仓库的路径）</p>
+<p><code>git init</code></p>
+<p>3、将文件添加到版本库</p>
+<p><code>git add &lt;文件名&gt;</code> 添加文件时，文件必须在当前目录下存在,可反复多次使用，添加多个文件</p>
+<p><code>git commit -m</code> “本次提交的说明”</p>
+<h2 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h2><p><code>git log</code> 显示最近到最远的提交日志,查看版本号</p>
+<p>在Git中，用HEA表示当前版本，上一个版本是HEAD^，上上个版本是HEAD^^，版本数多的时候，可以写成HEAD~100</p>
+<p><code>git reset --hard HEAD^</code> 回退到上个版本</p>
+<p>想恢复到新版本时</p>
+<p><code>git reflog</code> 查看历史命令，确定要回退到哪个版本</p>
+<p><code>git reset &lt;版本号&gt;</code> 去到未来某个版本</p>
+<h2 id="工作区和暂存区"><a href="#工作区和暂存区" class="headerlink" title="工作区和暂存区"></a>工作区和暂存区</h2><p>工作区：电脑里能看到的目录</p>
+<p>暂存区：暂存区（又叫stage或index）和master分支（以及指向master的一个指针叫HEAD）都放在Git的版本库（工作区的隐藏目录.git）中。</p>
+<p>当我们把文件往Git的版本库中添加的时候，<br><code>git add</code>命令，就是把文件修改添加到暂存区中。<br><code>git commit</code>命令，就是把暂存区的所有内容提交到当前分支</p>
+<h2 id="管理修改"><a href="#管理修改" class="headerlink" title="管理修改"></a>管理修改</h2><p>Git跟踪并管理的是修改，而非文件。</p>
+<p><code>git commit</code> 只负责把暂存区的的修改提交。工作区如果进行的第二次修改没有<code>git add</code>到暂存区,则第二次的修改不会被提交。</p>
+<p><code>git diff HEAD -- &lt;文件名&gt;</code> 查看工作区和版本库里面最新版本的区别</p>
+<h2 id="撤销修改"><a href="#撤销修改" class="headerlink" title="撤销修改"></a>撤销修改</h2><p><code>git checkout -- &lt;文件名&gt;</code> 让文件回到最近一次<code>git commit</code>或<code>git add</code>时的状态</p>
+<p>如果修改添加到了暂存区</p>
+<p><code>git reset HEAD &lt;文件名&gt;</code> 命令既可以回退版本，也可以把暂存区的修改撤销掉</p>
+<p>如果从暂存区提交到了版本库，就使用版本回退</p>
+<p>在新版本的Git中，引入<code>git restore</code>，原来的<code>git checkout</code>使用<code>git restore</code> 代替。原来的<code>git reset HEAD</code>使用<code>git restore --staged</code>代替。</p>
+<h2 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h2><p>当使用<code>rm</code>命令删除文件后。确定从版本库删除该文件，那就用<code>git rm</code>命令删除，并且<code>git commit</code>。如果只是误删，则可以使用<code>git checkout -- &lt;文件名&gt;</code>，把误删的文件恢复到最新版本。</p>
+<p><strong>从来没有被添加到版本库就被删除的文件，是无法回复的</strong></p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>GitHub就是提供Git仓库托管服务的，本地Git仓库和GitHub仓库之间的传输是通过SSH加密的。</p>
+<p>通过SSH连接远程仓库：</p>
+<p>第一步，在开始菜单打开git bash，输入以下命令生成密钥,一路默认，无需设置密码<br><code>ssh-keygen - t rsa -C &quot;你的email地址&quot;</code></p>
+<p>第二步，在用户主目录下的.ssh文件夹中找到id_rsa(私钥)和id_rsa.pub（公钥）。在GitGub的仓库设置中绑定公钥，这样GitHub就可以确认只有你自己能推送。</p>
+<h2 id="添加远程库"><a href="#添加远程库" class="headerlink" title="添加远程库"></a>添加远程库</h2><p>关联远程库，origin给远程库指定的名称</p>
+<p><code>git remote add origin git@server-name:path/repo-name.git</code></p>
+<p>关联后，使用命令<code>git push -u origin master</code>第一次推送master分支的所有内容</p>
+<p>此后，每次本地提交后，都可以使用命令<code>git push origin master</code>推送最新更改。</p>
+<p>查看远程库信息，显示了可以抓取和推送origin的地址。如果没有推送权限，就看不到push的地址</p>
+<p><code>git remote -v</code></p>
+<p>也可以解除本地仓库和远程仓库的绑定关系。<br><code>git remote rm origin</code></p>
+<h2 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h2><p><code>git clone git@&lt;GitHub仓库地址&gt;</code></p>
+<h2 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h2><p>创建属于自己的分支，在此分支内的工作不会影响到其他人。</p>
+<p>查看分支：<code>git branch</code></p>
+<p>创建分支：<code>git branch &lt;branchname&gt;</code></p>
+<p>切换分支：<code>git switch &lt;branchname&gt;</code></p>
+<p>创建+切换分支：<code>git switch -c &lt;branchname&gt;</code></p>
+<p>合并某分支到当前分支：<code>git merge &lt;branchname&gt;</code></p>
+<p>删除分支：<code>git branch -d &lt;branchname&gt;</code></p>
+<h2 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h2><p>当Git合并分支发生冲突时，需要先解决冲突，再提交，合并完成。解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，在提交。</p>
+<p><code>git log --graph</code> 查看分支合并图</p>
+<h2 id="分支管理策略"><a href="#分支管理策略" class="headerlink" title="分支管理策略"></a>分支管理策略</h2><p>Git使用Fast forward模式合并分支，删除分支后，会丢掉分支信息,看不出曾经做过合并。</p>
+<p>禁用Fast forward模式，Git就会再merge时生成一个新的commit<br><code>git merge --no-ff -m &quot;commit description&quot; &lt;branchname&gt;</code></p>
+<h2 id="BUG分支"><a href="#BUG分支" class="headerlink" title="BUG分支"></a>BUG分支</h2><p>修复bug时，我们会创建新的BUG分支进行修复，然后合并，最后删除；<br>当手头工作没有完成时，先把工作现场<code>git stash</code>一下，然后去修复bug，修复后，再<code>git stash pop</code>回到工作现场。</p>
+<p><code>git chrry-pick &lt;版本号&gt;</code> 复制一个特定的提交到当前分支</p>
+<p><code>git stash list</code> 查看存储的工作现场</p>
+<h2 id="Feature分支"><a href="#Feature分支" class="headerlink" title="Feature分支"></a>Feature分支</h2><p>开发一个新feature，最好新建一个分支。如果要丢弃一个没有被合并过的分支可以通过<code>git branch -D &lt;name&gt;</code>强行删除</p>
+<h2 id="多人协作"><a href="#多人协作" class="headerlink" title="多人协作"></a>多人协作</h2><p>在本地创建和远程分支对应的分支，使用<code>git checkout -b &lt;branchname&gt; &lt;origin&gt;/&lt;branchname&gt;</code>，本地和远程分支的名称最好一致。</p>
+<p>从本地推送分支，使用<code>git push &lt;origin&gt; &lt;branchname&gt;</code>,如果推送失败，则因为远程分支比你的本地更新，先用<code>git pull</code>抓取远程的新提交，进行合并，如果有冲突，则解决冲突。再用<code>git push &lt;origin&gt; &lt;branchname&gt;</code>推送就能成功。</p>
+<p>如果<code>git pull</code>提示<code>no tracking information</code>，则说明本地分支和远程分支的连接关系没有创建，用命令<code>git branch --set-upstream-to &lt;branchname&gt; origin/&lt;branchname&gt;</code></p>
+<h2 id="rebase"><a href="#rebase" class="headerlink" title="rebase"></a>rebase</h2><p>rebase操作可以把本地为push的分叉提交历史整理成直线。使得我们在查看历史提交的变化时更容易</p>
+<h2 id="标签管理"><a href="#标签管理" class="headerlink" title="标签管理"></a>标签管理</h2><p>在版本库中打一个标签，相当于做一个版本库的一个快照（指向某个commit的死指针，分支是指向commit的活指针）。相较于commit来说，tag是一个让人容易记住的有意义的名字</p>
+<h3 id="创建标签"><a href="#创建标签" class="headerlink" title="创建标签"></a>创建标签</h3><p><code>git tag &lt;tagname&gt;</code> 新建一个标签，默认为HEAD。</p>
+<p><code>git tag &lt;tagname&gt; &lt;commitid&gt;</code> 也可以指定一个commit id</p>
+<p><code>git tag -a &lt;tagname&gt; -m &quot;description&quot;</code> 指定标签信息</p>
+<p><code>git tag</code> 查看所有标签</p>
+<h3 id="操作标签"><a href="#操作标签" class="headerlink" title="操作标签"></a>操作标签</h3><p><code>git push origin &lt;tagname&gt;</code> 推送一个本地标签</p>
+<p><code>git push origin --tags</code> 可以推送全部未推送过的本地标签</p>
+<p><code>git tag -d &lt;tagname&gt;</code> 可以删除一个本地标签</p>
+<p><code>git push origin :refs/tags/&lt;tagname&gt;</code> 可以删除一个远程标签</p>
+
       
 
       
